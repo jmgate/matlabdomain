@@ -434,9 +434,7 @@ class MatlabDocumenter(PyDocumenter):
                             self.fullname,
                         )
         elif self.options.inherited_members:
-            # safe_getmembers() uses dir() which pulls in members from all
-            # base classes
-            members = inspect.get_members(self.object, attr_getter=self.get_attr)
+            members = self.get_inherited_members(self.object)
         else:
             # __dict__ contains only the members directly defined in
             # the class (but get them via getattr anyway, to e.g. get
@@ -458,6 +456,35 @@ class MatlabDocumenter(PyDocumenter):
             if aname not in membernames and (want_all or aname in self.options.members):
                 members.append((aname, INSTANCEATTR))
         return False, sorted(members)
+
+    def get_inherited_members(self, entity: MatClass) -> list[tuple[foo, bar]]:
+        if not isinstance(entity, MatClass):
+            return []
+        members = {}
+        for base in self.get_matlab_bases(entity):
+            if hasattr(base, "methods"):
+                members.update(base.methods)
+            if hasattr(base, "properties"):
+                members.update(base.properties)
+            if hasattr(base, "enumerations"):
+                members.update(base.enumerations)
+        return list(members.items())
+
+    def get_matlab_bases(self, entity: MatClass) -> list[MatClass]:
+        """
+        Get the list of all bases classes for the given class.
+
+        Args:
+            entity:  The class to get the bases for.
+
+        Returns:
+            The list of base classes, starting with the given class, and
+            working its way up the inheritance hierarchy.
+        """
+        bases = [entity]
+        for base in entity.bases:
+            bases.extend(self.get_matlab_bases(base))
+        return bases
 
     def filter_members(self, members, want_all):
         """Filter the given member list.
