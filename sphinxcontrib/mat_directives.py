@@ -16,6 +16,10 @@ from sphinx.ext.autodoc.directive import (
     parse_generated_content,
     process_documenter_options,
 )
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from docutils.nodes import Node
 
 logger = sphinx.util.logging.getLogger("matlab-domain")
 
@@ -36,7 +40,7 @@ class MatlabAutodocDirective(AutodocDirective):
     optional_arguments = 0
     final_argument_whitespace = True
 
-    def run(self):
+    def run(self) -> List[Node]:
         reporter = self.state.document.reporter
 
         try:

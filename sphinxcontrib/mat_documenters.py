@@ -80,7 +80,7 @@ class MatlabDocumenter(PyDocumenter):
 
     domain = "mat"
 
-    def parse_name(self):
+    def parse_name(self) -> bool:
         """
         From: sphinx/ext/autodoc/__init__.py
         Determine what module to import and what attribute to document.
@@ -125,7 +125,7 @@ class MatlabDocumenter(PyDocumenter):
 
         return True
 
-    def import_object(self):
+    def import_object(self, _raiseerror: bool = False) -> bool:
         """Import the object given by *self.modname* and *self.objpath* and set
         it as *self.object*.
 
@@ -163,7 +163,7 @@ class MatlabDocumenter(PyDocumenter):
             self.env.note_reread()
             return False
 
-    def add_content(self, more_content, no_docstring=False):
+    def add_content(self, more_content, no_docstring: bool = False) -> None:
         """Add content from docstrings, attribute documentation and user."""
         sourcename = "docstring of %s" % self.fullname
 
